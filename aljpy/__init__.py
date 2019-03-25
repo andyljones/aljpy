@@ -1,7 +1,7 @@
 import pandas as pd
 import scipy as sp
 
-from . import email, log, notify
+from . import email, log, notify, plot
 from .humanhash import humanhash
 from .cache import autocache, memcache
 from .parallel import parallel
