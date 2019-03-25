@@ -1,0 +1,100 @@
+import os
+import gzip
+import pickle
+import inspect 
+from pathlib import Path
+from functools import wraps
+
+def _diskcache(path, f, *args, **kwargs):
+    path.parent.mkdir(exist_ok=True, parents=True)
+    if not path.exists():
+        path.write_bytes(gzip.compress(pickle.dumps(f(*args, **kwargs))))
+    return pickle.loads(gzip.decompress(path.read_bytes()))
+
+def _diskclear(path):
+    if path.exists():
+        path.unlink()
+
+def _memcache(cache, path, f, *args, **kwargs):
+    if path not in cache:
+        cache[path] = f(*args, **kwargs)
+    return cache[path]
+
+def _memclear(cache, path):
+    if path in cache:
+        del cache[path]
+
+def autocache(filepattern=None, disk=True, memory=False, root='.cache'):
+    """Uses the modulename, function name and arguments to cache the results of a
+    function in a sensible location. For example, suppose you have a function called 
+    `transactions` in a module called `banks.starling`. It takes one argument, a date.
+    Then by decorating it as
+    ```
+    @autocache('{date:%Y-%m-%d}')
+    def transactions(date):
+        ...
+    ```
+    when you call `transactions(pd.Timestamp('2018-11-22'))`, the result will be stored
+    to `.cache/banks/starling/transactions/2018-11-22`. Next time you call it with the 
+    same argument, the result will be loaded from that cache file.
+    If you leave the pattern empty, it'll default to a concatenation of the params. So
+    you could have easily written
+    ```
+    @autocache()
+    def transactions(date):
+        ...
+    ```
+    What's more, you can also set `memory=True` and get an additional in-memory cache 
+    that wraps the disk cache. If a result is in memory, that'll be returned, else 
+    it'll go to the disk, and only if the result is missing there too will the
+    function be called.
+    """  
+
+    # Default to `.cache/slashed/module/path`
+    frame = inspect.stack()[1]
+    module = inspect.getmodule(frame[0]).__name__
+
+    def decorator(f):
+        nonlocal filepattern
+
+        if filepattern is None:
+            params = inspect.signature(f).parameters
+            filepattern = '-'.join(f'{{{p}}}' for p in params)
+
+        # If the function is parameterless, fall back to the base path
+        parts = [root, *module.split('.'), f.__name__]
+        parts = parts + [filepattern] if filepattern else parts
+        pattern = os.path.join(*parts) 
+
+        cache = {}
+
+        def cachepath(*args, **kwargs):
+            bind = inspect.signature(f).bind(*args, **kwargs)
+            bind.apply_defaults()
+            return Path(pattern.format(**bind.arguments))
+        
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            path = cachepath(*args, **kwargs)
+            if memory and disk:
+                return _memcache(cache, path, _diskcache, path, f, *args, **kwargs)
+            elif disk:
+                return _diskcache(path, f, *args, **kwargs)
+            elif memory:
+                return _memcache(cache, path, f, *args, **kwargs)
+            else:
+                return f
+    
+        def clear(*args, **kwargs):
+            path = cachepath(*args, **kwargs)
+            if memory:
+                _memclear(cache, path)
+            if disk:
+                _diskclear(path)
+        
+        wrapped.clear = clear
+        return wrapped
+    return decorator
+
+def memcache(*args, **kwargs):
+    return autocache(*args, **kwargs, memory=True, disk=False)
