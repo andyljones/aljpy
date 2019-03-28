@@ -10,7 +10,7 @@ class Timer:
     def stop(self):
         self._end = time.perf_counter()
     
-    def duration():
+    def time(self):
         return self._end - self._start
     
 @contextmanager

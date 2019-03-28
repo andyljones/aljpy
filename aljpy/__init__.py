@@ -1,5 +1,5 @@
 from . import email, log, notify, plot
-from .timer import time
+from .timer import timer
 from .humanhash import humanhash
 from .cache import autocache, memcache
 from .parallel import parallel
