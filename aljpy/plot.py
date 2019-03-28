@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+from pathlib import Path
 
 def percent_axis(ax=None, axis='x'):
     ax = (ax or plt.gca())
@@ -27,3 +28,12 @@ def suffix_axis(ax=None, axis='x'):
 
     axis.set_major_formatter(FuncFormatter(formatter)) 
     
+def save(name, fig=None):
+    if set('./') & set(name):
+        path = Path(name)
+    else:
+        path = Path(f'./output/plots/{name}.png')
+    path.parent.mkdir(exist_ok=True, parents=True)
+
+    fig = (fig or plt.gcf())
+    fig.savefig(path, bbox_inches='tight')
