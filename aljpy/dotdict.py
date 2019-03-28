@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+
 class dotdict(dict):
     
     __setattr__ = dict.__setitem__
@@ -22,7 +25,7 @@ class dotdict(dict):
             has_short_repr = (len(rep.splitlines()) == 1) and (len(rep) < val_length)
             if has_short_repr:
                 d[k] = repr(v)
-            elif type(v) in (pd.Series, pd.DataFrame, pd.Panel, sp.ndarray):                    
+            elif type(v) in (pd.Series, pd.DataFrame, pd.Panel, np.ndarray):                    
                 d[k] = f'{v.shape}-{type(v).__name__}'
             elif type(v) in (list, set, dict):
                 d[k] = f'({len(v)},)-{type(v).__name__}'
