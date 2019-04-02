@@ -1,6 +1,7 @@
 import sys
 import inspect
 import logging
+from contextlib import contextmanager
 
 logging.basicConfig(
             stream=sys.stdout, 
@@ -25,6 +26,16 @@ def modulelogger(method):
         return getattr(log, method)(*args, **kwargs)
 
     return g
+
+@contextmanager
+def suppress(name):
+    try:
+        logger = logging.getLogger(name)
+        level = logger.getEffectiveLevel()
+        logger.setLevel('ERROR')
+        yield
+    finally:
+        logger.setLevel(level)
 
 debug = modulelogger('debug')
 info = modulelogger('info')
