@@ -1,4 +1,3 @@
-import json
 """To get this to work, you need to set up a mailgun account and then create a `~/.credentials/mailgun.json` file that looks like
 
 ```
@@ -7,6 +6,7 @@ import json
 
 The domain will be a huge hashed string unless you've set up a custom domain. You should set up a custom domain.
 """
+import json
 import requests
 from pathlib import Path
 

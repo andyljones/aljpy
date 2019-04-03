@@ -6,4 +6,6 @@ setup(name='aljpy',
       author='Andy Jones',
       author_email='andyjones.ed@gmail.com',
       url='https://github.com/andyljones/aljpy',
-      packages=['aljpy'])
+      packages=['aljpy'],
+      package_data={'aljpy': ['*.txt']},
+      include_package_data=True)
