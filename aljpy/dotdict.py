@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
+from collections import OrderedDict
 
-class dotdict(dict):
+class dotdict(OrderedDict):
     
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
