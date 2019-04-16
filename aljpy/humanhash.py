@@ -23,7 +23,7 @@ def humanhash(s=None, n=3):
     There are 600 adjectives and 2500 nouns, so the default hash space has 4bn members.
     """
     if s is None:
-        return humanhash(str(uuid.uuid4()))
+        return humanhash(str(uuid.uuid4()), n=n)
 
     bs = s.encode()
     ints = []
