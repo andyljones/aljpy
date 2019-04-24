@@ -11,7 +11,7 @@ class Timer:
         self._end = time.perf_counter()
     
     def time(self):
-        return self._end - self._start
+        return (self._end or time.perf_counter()) - self._start
     
 @contextmanager
 def timer():

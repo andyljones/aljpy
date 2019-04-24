@@ -54,7 +54,7 @@ def parallel(f, progress=True, **kwargs):
         def reraise(f, futures={}):
             e = f.exception()
             if e:
-                log.warning('Exception raised on "{}"'.format(futures[f]), exc_info=e)
+                log.warn('Exception raised on "{}"'.format(futures[f]), exc_info=e)
                 raise e
             return f.result()
 
