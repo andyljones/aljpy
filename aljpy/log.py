@@ -18,6 +18,7 @@ def logger(**kwargs):
 
 loggers = {}
 def modulelogger(method):
+    #TODO: Holy hell, the stack inspection here is much slower than I expected
 
     def g(*args, **kwargs):
         caller = inspect.stack()[1]

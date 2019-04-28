@@ -1,4 +1,5 @@
 from . import email, log, notify, plot
+from .log import logger
 from .timer import timer
 from .humanhash import humanhash
 from .cache import autocache, memcache
