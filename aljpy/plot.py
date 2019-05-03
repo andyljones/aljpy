@@ -37,3 +37,9 @@ def save(name, fig=None):
 
     fig = (fig or plt.gcf())
     fig.savefig(path, bbox_inches='tight')
+
+def array(fig=None):
+    fig = (fig or plt.gcf())
+    fig.canvas.draw()
+    data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
