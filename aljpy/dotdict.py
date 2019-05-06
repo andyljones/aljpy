@@ -2,6 +2,40 @@ import pandas as pd
 import numpy as np
 from collections import OrderedDict
 
+def treestr(t):
+    """Stringifies a tree structure. These turn up all over the place in my code, so it's worth factoring out"""
+    key_length = max(map(len, map(str, t.keys()))) if t.keys() else 0
+    max_spaces = 4 + key_length
+    val_length = 119 - max_spaces
+    
+    d = {}
+    for k, v in t.items():
+        rep = repr(v)
+        has_short_repr = (len(rep.splitlines()) == 1) and (len(rep) < val_length)
+        if has_short_repr:
+            d[k] = repr(v)
+        elif hasattr(v, 'shape'):                    
+            d[k] = f'{tuple(v.shape)}-{type(v).__name__}'
+        elif type(v) in (list, set, dict):
+            d[k] = f'({len(v)},)-{type(v).__name__}'
+        elif type(v) in (type(t),):
+            d[k] = str(v)
+        elif repr(v):
+            d[k] = f'{repr(v).splitlines()[0][:val_length]} ...'
+        else:
+            d[k] = f'{type(v).__name__}()'
+
+    s = []
+    for k, v in d.items():
+        lines = v.splitlines() or ['']
+        s.append(str(k) + ' '*(max_spaces - len(str(k))) + lines[0])
+        for l in lines[1:]:
+            s.append(' '*max_spaces + l)
+        # if len(lines) > 1:
+        #     s.append('\n')
+
+    return '\n'.join(s)
+
 class dotdict(OrderedDict):
     
     __setattr__ = dict.__setitem__
@@ -16,37 +50,7 @@ class dotdict(OrderedDict):
         raise KeyError(k)
     
     def __str__(self):
-        key_length = max(map(len, map(str, self.keys()))) if self.keys() else 0
-        max_spaces = 4 + key_length
-        val_length = 119 - max_spaces
-        
-        d = {}
-        for k, v in self.items():
-            rep = repr(v)
-            has_short_repr = (len(rep.splitlines()) == 1) and (len(rep) < val_length)
-            if has_short_repr:
-                d[k] = repr(v)
-            elif type(v) in (pd.Series, pd.DataFrame, pd.Panel, np.ndarray):                    
-                d[k] = f'{v.shape}-{type(v).__name__}'
-            elif type(v) in (list, set, dict):
-                d[k] = f'({len(v)},)-{type(v).__name__}'
-            elif type(v) in (dotdict,):
-                d[k] = str(v)
-            elif repr(v):
-                d[k] = f'{repr(v).splitlines()[0][:val_length]} ...'
-            else:
-                d[k] = f'{type(v).__name__}()'
-
-        s = []
-        for k, v in d.items():
-            lines = v.splitlines() or ['']
-            s.append(str(k) + ' '*(max_spaces - len(k)) + lines[0])
-            for l in lines[1:]:
-                s.append(' '*max_spaces + l)
-            if len(lines) > 1:
-                s.append('\n')
-
-        return '\n'.join(s)
+        return treestr(self)
     
     def __repr__(self):
         return self.__str__()
