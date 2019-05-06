@@ -10,22 +10,16 @@ def treestr(t):
     
     d = {}
     for k, v in t.items():
-        rep = repr(v)
-        has_short_repr = (len(rep.splitlines()) == 1) and (len(rep) < val_length)
-        if has_short_repr:
-            d[k] = repr(v)
-        elif hasattr(v, 'shape'):                    
+        if hasattr(v, 'shape'):                    
             d[k] = f'{tuple(v.shape)}-{type(v).__name__}'
         elif type(v) in (list, set, dict):
             d[k] = f'({len(v)},)-{type(v).__name__}'
         elif type(v) in (type(t),):
             d[k] = str(v)
-        elif repr(v):
-            d[k] = f'{repr(v).splitlines()[0][:val_length]} ...'
         else:
-            d[k] = f'{type(v).__name__}()'
+            d[k] = f'{str(v).splitlines()[0][:val_length]} ...'
 
-    s = []
+    s = [f'{type(t).__name__}:']
     for k, v in d.items():
         lines = v.splitlines() or ['']
         s.append(str(k) + ' '*(max_spaces - len(str(k))) + lines[0])
