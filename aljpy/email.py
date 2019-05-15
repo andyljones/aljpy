@@ -8,6 +8,7 @@ The domain will be a huge hashed string unless you've set up a custom domain. Yo
 """
 import json
 import requests
+from io import BytesIO
 from pathlib import Path
 
 def credentials():
@@ -26,14 +27,16 @@ def destination(emails):
     else:
         return emails
 
-def send(subject, content=' ', to=None, sender='python'):
+def send(subject, content=' ', to=None, sender='python', attachments={}):
     data = {
         'from': f'{sender}@{credentials()["domain"]}',
         'to': destination(to),
         'subject': subject,
         'text': content}
+    files = [('attachment', (k, BytesIO(v))) for k, v in attachments.items()]
     r = requests.post(
                 f'{root()}/messages',
                 auth=('api', credentials()['key']),
-                data=data)
+                data=data,
+                files=files)
     r.raise_for_status()
