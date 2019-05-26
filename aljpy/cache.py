@@ -1,3 +1,4 @@
+import time
 import os
 import gzip
 import pickle
@@ -24,7 +25,21 @@ def _memclear(cache, path):
     if path in cache:
         del cache[path]
 
-def autocache(filepattern=None, disk=True, memory=False, root='.cache'):
+def _timecache(duration, cache, path, f, *args, **kwargs):
+    if path in cache:
+        calltime, val = cache[path]
+        if (time.time() - calltime) < duration:
+            return val
+    calltime, val = time.time(), f(*args, **kwargs)
+    cache[path] = (calltime, val)
+    return val
+
+def _cachepather(f, filepattern, root):
+
+    
+    return cachepath
+
+def autocache(filepattern=None, disk=True, memory=False, duration=None, root='.cache'):
     """Uses the modulename, function name and arguments to cache the results of a
     function in a sensible location. For example, suppose you have a function called 
     `transactions` in a module called `banks.starling`. It takes one argument, a date.
@@ -55,8 +70,9 @@ def autocache(filepattern=None, disk=True, memory=False, root='.cache'):
     module = inspect.getmodule(frame[0]).__name__
 
     def decorator(f):
-        nonlocal filepattern
+        cache = {}
 
+        nonlocal filepattern
         if filepattern is None:
             params = inspect.signature(f).parameters
             filepattern = '-'.join(f'{{{p}}}' for p in params)
@@ -66,8 +82,6 @@ def autocache(filepattern=None, disk=True, memory=False, root='.cache'):
         parts = parts + [filepattern] if filepattern else parts
         pattern = os.path.join(*parts) 
 
-        cache = {}
-
         def cachepath(*args, **kwargs):
             bind = inspect.signature(f).bind(*args, **kwargs)
             bind.apply_defaults()
@@ -76,7 +90,11 @@ def autocache(filepattern=None, disk=True, memory=False, root='.cache'):
         @wraps(f)
         def wrapped(*args, **kwargs):
             path = cachepath(*args, **kwargs)
-            if memory and disk:
+            if duration:
+                #TODO: Implement disk duration caching.
+                assert not disk, 'Can\'t specify a duration and use disk caching'
+                return _timecache(duration, cache, path, f, *args, **kwargs)
+            elif memory and disk:
                 return _memcache(cache, path, _diskcache, path, f, *args, **kwargs)
             elif disk:
                 return _diskcache(path, f, *args, **kwargs)
@@ -98,3 +116,6 @@ def autocache(filepattern=None, disk=True, memory=False, root='.cache'):
 
 def memcache(*args, **kwargs):
     return autocache(*args, **kwargs, memory=True, disk=False)
+
+def timecache(duration, *args, **kwargs):
+    return autocache(*args, **kwargs, duration=duration, disk=False)
