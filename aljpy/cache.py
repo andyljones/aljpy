@@ -35,8 +35,6 @@ def _timecache(duration, cache, path, f, *args, **kwargs):
     return val
 
 def _cachepather(f, filepattern, root):
-
-    
     return cachepath
 
 def autocache(filepattern=None, disk=True, memory=False, duration=None, root='.cache'):

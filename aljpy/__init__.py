@@ -6,4 +6,4 @@ from .cache import autocache, memcache, timecache
 from .parallel import parallel
 from .dotdict import dotdict
 from .debugging import extract
-
+from .download import download
