@@ -9,7 +9,7 @@ from functools import wraps
 def _diskcache(path, f, *args, **kwargs):
     path.parent.mkdir(exist_ok=True, parents=True)
     if not path.exists():
-        path.write_bytes(gzip.compress(pickle.dumps(f(*args, **kwargs))))
+        path.write_bytes(gzip.compress(pickle.dumps(f(*args, **kwargs), protocol=4)))
     return pickle.loads(gzip.decompress(path.read_bytes()))
 
 def _diskclear(path):
