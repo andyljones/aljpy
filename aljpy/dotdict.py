@@ -41,7 +41,7 @@ class dotdict(OrderedDict):
     def __getattr__(self, k):
         if k in self:
             return self[k]
-        raise KeyError(k)
+        raise AttributeError(k)
     
     def __str__(self):
         return treestr(self)
