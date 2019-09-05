@@ -32,8 +32,8 @@ def treestr(t):
 
 class dotdict(OrderedDict):
     
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+    __setattr__ = OrderedDict.__setitem__
+    __delattr__ = OrderedDict.__delitem__
     
     def __dir__(self):
         return sorted(set(super().__dir__() + list(self.keys())))
@@ -60,4 +60,3 @@ class dotdict(OrderedDict):
     
     def pipe(self, f, *args, **kwargs):
         return f(self, *args, **kwargs)
-
