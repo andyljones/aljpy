@@ -10,12 +10,12 @@ def treestr(t):
     
     d = {}
     for k, v in t.items():
-        if hasattr(v, 'shape'):                    
-            d[k] = f'{tuple(v.shape)}-{type(v).__name__}'
-        elif type(v) in (list, set, dict):
-            d[k] = f'({len(v)},)-{type(v).__name__}'
-        elif type(v) in (type(t),):
+        if isinstance(v, dotdict):
             d[k] = str(v)
+        elif isinstance(v, (list, set, dict)):
+            d[k] = f'({len(v)},)-{type(v).__name__}'
+        elif hasattr(v, 'shape'):                    
+            d[k] = f'{tuple(v.shape)}-{type(v).__name__}'
         else:
             d[k] = f'{str(v).splitlines()[0][:val_length]} ...'
 
@@ -38,11 +38,18 @@ class dotdict(OrderedDict):
     def __dir__(self):
         return sorted(set(super().__dir__() + list(self.keys())))
 
-    def __getattr__(self, k):
-        if k in self:
-            return self[k]
-        raise AttributeError(k)
-    
+    def __getattr__(self, key):
+        if key in self:
+            return self[key]
+        else:
+            try:
+                getattr(super(), key)
+            except AttributeError:
+                return type(self)({k: getattr(v, key) for k, v in self.items()})
+
+    def __call__(self, *args, **kwargs):
+        return type(self)({k: v(*args, **kwargs) for k, v in self.items()})
+
     def __str__(self):
         return treestr(self)
     
@@ -56,7 +63,7 @@ class dotdict(OrderedDict):
         self.update(state)
     
     def copy(self):
-        return dotdict(super().copy()) 
+        return type(self)(super().copy()) 
     
     def pipe(self, f, *args, **kwargs):
         return f(self, *args, **kwargs)
