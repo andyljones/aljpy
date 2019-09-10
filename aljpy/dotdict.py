@@ -32,9 +32,6 @@ def treestr(t):
 
 class dotdict(OrderedDict):
     
-    __setattr__ = OrderedDict.__setitem__
-    __delattr__ = OrderedDict.__delitem__
-    
     def __dir__(self):
         return sorted(set(super().__dir__() + list(self.keys())))
 
