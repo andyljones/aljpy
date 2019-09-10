@@ -17,7 +17,11 @@ def treestr(t):
         elif hasattr(v, 'shape'):                    
             d[k] = f'{tuple(v.shape)}-{type(v).__name__}'
         else:
-            d[k] = f'{str(v).splitlines()[0][:val_length]} ...'
+            lines = str(v).splitlines()
+            if (len(lines) > 1) or (len(lines[0]) > val_length):
+                d[k] = lines[0][:val_length] + ' ...'
+            else:
+                d[k] = lines[0]
 
     s = [f'{type(t).__name__}:']
     for k, v in d.items():
