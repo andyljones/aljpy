@@ -1,12 +1,12 @@
-import pandas as pd
-import numpy as np
 from collections import OrderedDict
+
+SCREEN_WIDTH = 119
 
 def treestr(t):
     """Stringifies a tree structure. These turn up all over the place in my code, so it's worth factoring out"""
     key_length = max(map(len, map(str, t.keys()))) if t.keys() else 0
     max_spaces = 4 + key_length
-    val_length = 119 - max_spaces
+    val_length = SCREEN_WIDTH - max_spaces
     
     d = {}
     for k, v in t.items():
@@ -29,8 +29,6 @@ def treestr(t):
         s.append(str(k) + ' '*(max_spaces - len(str(k))) + lines[0])
         for l in lines[1:]:
             s.append(' '*max_spaces + l)
-        # if len(lines) > 1:
-        #     s.append('\n')
 
     return '\n'.join(s)
 
@@ -46,10 +44,10 @@ class dotdict(OrderedDict):
             try:
                 getattr(super(), key)
             except AttributeError:
-                return type(self)({k: getattr(v, key) for k, v in self.items()})
+                return type(self)([(k, getattr(v, key)) for k, v in self.items()])
 
     def __call__(self, *args, **kwargs):
-        return type(self)({k: v(*args, **kwargs) for k, v in self.items()})
+        return type(self)([(k, v(*args, **kwargs)) for k, v in self.items()])
 
     def __str__(self):
         return treestr(self)
