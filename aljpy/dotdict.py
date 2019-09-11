@@ -41,10 +41,7 @@ class dotdict(OrderedDict):
         if key in self:
             return self[key]
         else:
-            try:
-                getattr(super(), key)
-            except AttributeError:
-                return type(self)([(k, getattr(v, key)) for k, v in self.items()])
+            return type(self)([(k, getattr(v, key)) for k, v in self.items()])
 
     def __call__(self, *args, **kwargs):
         return type(self)([(k, v(*args, **kwargs)) for k, v in self.items()])
