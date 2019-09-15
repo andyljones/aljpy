@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import wraps
 
 SCREEN_WIDTH = 119
 
@@ -32,6 +33,27 @@ def treestr(t):
 
     return '\n'.join(s)
 
+def mapping(f):
+    @wraps(f)
+    def g(x, *args, **kwargs):
+        if isinstance(x, dict):
+            return type(x)([(k, g(v, *args, **kwargs)) for k, v in x.items()])
+        if isinstance(f, str):
+            return getattr(x, f)(*args, **kwargs)
+        return f(x, *args, **kwargs)
+    return g
+
+def starmapping(f):
+    @wraps(f)
+    def g(x, *args):
+        if isinstance(x, dict):
+            return type(x)([(k, g(x[k], *(a[k] for a in args))) for k in x])
+        if isinstance(f, str):
+            return getattr(x, f)(*args)
+        else:
+            return f(x, *args)
+    return g
+
 class dotdict(OrderedDict):
     
     def __dir__(self):
@@ -63,3 +85,9 @@ class dotdict(OrderedDict):
     
     def pipe(self, f, *args, **kwargs):
         return f(self, *args, **kwargs)
+
+    def starmap(self, f, *args):
+        return starmapping(f)(self, *args)
+
+    def map(self, f, *args, **kwargs):
+        return mapping(f)(self, *args, **kwargs)
