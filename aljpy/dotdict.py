@@ -63,7 +63,10 @@ class dotdict(OrderedDict):
         if key in self:
             return self[key]
         else:
-            return type(self)([(k, getattr(v, key)) for k, v in self.items()])
+            try:
+                return type(self)([(k, getattr(v, key)) for k, v in self.items()])
+            except AttributeError:
+                raise AttributeError(f"There is no member called '{key}' and one of the leaves has no attribute '{key}'") from None
 
     def __call__(self, *args, **kwargs):
         return type(self)([(k, v(*args, **kwargs)) for k, v in self.items()])
