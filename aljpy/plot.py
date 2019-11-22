@@ -8,7 +8,7 @@ def percent_axis(ax=None, axis='x'):
     axis = getattr(ax, f'{axis}axis')
     axis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0%}')) 
 
-def suffix_axis(ax=None, axis='x'):
+def suffix_axis(ax=None, axis='x', prefix=''):
     ax = (ax or plt.gca())
     axis = getattr(ax, f'{axis}axis')
 
@@ -22,9 +22,9 @@ def suffix_axis(ax=None, axis='x'):
 
     def formatter(x, pos):
         if x == 0:
-            return f'{x}'
+            return f'{prefix}{x:.0f}'
         else:
-            return f'{x/10**scale}{suffix}'
+            return f'{prefix}{x/10**scale:.0f}{suffix}'
 
     axis.set_major_formatter(FuncFormatter(formatter)) 
     
