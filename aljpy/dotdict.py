@@ -54,6 +54,11 @@ def starmapping(f):
             return f(x, *args)
     return g
 
+def leaves(t):
+    if isinstance(t, dict):
+        return [l for v in t.values() for l in leaves(v)]
+    return [t]
+
 class dotdict(OrderedDict):
     
     def __dir__(self):
