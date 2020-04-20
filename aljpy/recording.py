@@ -50,7 +50,9 @@ class Encoder:
 
     def __call__(self, arr):
         if isinstance(arr, plt.Figure):
-            arr = array(arr)
+            fig = arr
+            arr = array(fig)
+            fig.gcf()
 
         if not self._initialized:
             self._initialize(arr)
