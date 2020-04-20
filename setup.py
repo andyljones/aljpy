@@ -1,7 +1,7 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='aljpy',
-      version='0.2',
+      version='0.4',
       description='Andy\'s common tools',
       author='Andy Jones',
       author_email='andyjones.ed@gmail.com',
