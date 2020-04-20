@@ -3,6 +3,20 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from pathlib import Path
 
+def si_suffix(x):
+    #TODO: merge with suffix_axis
+    suffixes = np.array(['', 'k', 'm', 'b', 't'])
+
+    order = np.log10(max(abs(x), 1))
+    index = min(int(order//3), len(suffixes)-1)
+    suffix = suffixes[index]
+
+    significand = x / (10**(3*(order//3)))
+    rounded = float(f'{significand:.2g}')
+    head = str(int(rounded) if rounded % 1 == 0 else rounded)
+
+    return head + suffix
+
 def percent_axis(ax=None, axis='x'):
     ax = (ax or plt.gca())
     axis = getattr(ax, f'{axis}axis')
