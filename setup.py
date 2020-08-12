@@ -1,12 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='aljpy',
-      version='0.5',
+      version='0.6',
       description='Andy\'s common tools',
       author='Andy Jones',
       author_email='andyjones.ed@gmail.com',
       url='https://github.com/andyljones/aljpy',
-      packages=['aljpy'],
+      packages=find_packages(),
       package_data={'aljpy': ['*.txt']},
-      include_package_data=True,
       install_requires=['tqdm>=4.42'])
