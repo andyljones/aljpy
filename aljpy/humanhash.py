@@ -3,7 +3,7 @@ import hashlib
 from pkg_resources import resource_string
 from . import cache
 
-__all__ = ('humanhash')
+__all__ = ('humanhash',)
 
 @cache.memcache()
 def nouns(maxlen=6):

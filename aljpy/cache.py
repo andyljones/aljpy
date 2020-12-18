@@ -34,9 +34,6 @@ def _timecache(duration, cache, path, f, *args, **kwargs):
     cache[path] = (calltime, val)
     return val
 
-def _cachepather(f, filepattern, root):
-    return cachepath
-
 def autocache(filepattern=None, disk=True, memory=False, duration=None, root='.cache'):
     """Uses the modulename, function name and arguments to cache the results of a
     function in a sensible location. For example, suppose you have a function called 
@@ -63,11 +60,10 @@ def autocache(filepattern=None, disk=True, memory=False, duration=None, root='.c
     function be called.
     """  
 
-    # Default to `.cache/slashed/module/path`
-    frame = inspect.stack()[1]
-    module = inspect.getmodule(frame[0]).__name__
-
     def decorator(f):
+        # Default to `.cache/slashed/module/path`
+        module = f.__module__
+
         cache = {}
 
         nonlocal filepattern
