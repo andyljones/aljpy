@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='aljpy',
-      version='0.6',
+      version='0.7',
       description='Andy\'s common tools',
       author='Andy Jones',
       author_email='andyjones.ed@gmail.com',

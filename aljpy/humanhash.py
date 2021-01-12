@@ -9,13 +9,13 @@ __all__ = ('humanhash',)
 def nouns(maxlen=6):
     nouns = resource_string(__package__, 'humanhashnouns.txt').decode().split('\r\n')
     # Six-char-or-less nouns make up half the list
-    return [n for n in nouns if len(n) <= maxlen]
+    return [n for n in nouns if 0 < len(n) <= maxlen]
 
 @cache.memcache()
 def adjectives(maxlen=6):
     adjs = resource_string(__package__, 'humanhashadjectives.txt').decode().split('\n')
     # Six-char-or-less adjectives make up half the list
-    return [a for a in adjs if len(a) <= maxlen]
+    return [a for a in adjs if 0 < len(a) <= maxlen]
 
 def humanhash(s=None, n=3, maxlen=6):
     """Hashes `s` into a sentence of hash-separated words. The first `n-1` are adjectives; the last is a noun.
