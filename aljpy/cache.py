@@ -72,8 +72,8 @@ def autocache(filepattern=None, disk=True, memory=False, duration=None, root='.c
             filepattern = '-'.join(f'{{{p}}}' for p in params)
 
         # If the function is parameterless, fall back to the base path
-        parts = [root, *module.split('.'), f.__name__]
-        parts = parts + [filepattern] if filepattern else parts
+        root_parts = [root, *module.split('.'), f.__name__]
+        parts = root_parts + [filepattern] if filepattern else root_parts
         pattern = os.path.join(*parts) 
 
         def cachepath(*args, **kwargs):
@@ -103,8 +103,17 @@ def autocache(filepattern=None, disk=True, memory=False, duration=None, root='.c
                 _memclear(cache, path)
             if disk:
                 _diskclear(path)
+
+        def clear_all():
+            global cache
+            if disk:
+                shutil.rmtree(os.path.join(*root_parts))
+            if memory:
+                cache = {}
         
         wrapped.clear = clear
+        wrapped.clear_all = clear_all
+
         return wrapped
     return decorator
 
